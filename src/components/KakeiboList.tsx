@@ -1,27 +1,27 @@
 import React from "react";
-import { Todo } from "../lib/interface";
-import { deleteTodo } from "../lib/todoApi/fetch";
+import { Kakeibo } from "../lib/interface";
+import { deleteKakeibo } from "../lib/kakeiboApi/fetch";
 
 type Props = {
-    todo: Todo[];
+    kakeibo: Kakeibo[];
     onDelete: () => void;
 };
 
-const TodoList = ({todo, onDelete}: Props) => {
+const KakeiboList = ({kakeibo, onDelete}: Props) => {
     const handleDelete = async (id: number) => {
-        await deleteTodo(id);
+        await deleteKakeibo(id);
         onDelete();
     } 
 
     return(
         <div>
             <ul className="space-y-2">
-                {todo.map((item) => (
+                {kakeibo.map((item) => (
                     <li 
                         key={item.id}
                         className="flex justify-between items-center px-4 py-2 bg-gray-100 rounded shadow-md"
                     >
-                        <span className="text-gray-800">{item.title}</span>
+                        <span className="text-gray-800">{item.title}: {item.amount}: {item.date.slice(5, 10)}</span>
                         <span
                             onClick={() => handleDelete(item.id)}
                             className="text-red-500 hover:text-red-700 text-xl" aria-label="削除"
@@ -35,4 +35,4 @@ const TodoList = ({todo, onDelete}: Props) => {
     );
 };
 
-export default TodoList;
+export default KakeiboList;

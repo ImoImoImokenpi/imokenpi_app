@@ -1,6 +1,6 @@
-import { supabase } from './supabase-client';
+import { supabase } from '../supabase-client';
 
-export const fetchTodos = async () => {
+export const fetchKakeibos = async () => {
   const {
     data: { user },
     error: userError,
@@ -17,7 +17,7 @@ export const fetchTodos = async () => {
   }
 
   const { data, error } = await supabase
-    .from("todo")
+    .from("kakeibo")
     .select("*")
     .eq("user_id", user.id);  // ユーザーIDでフィルタ
 
@@ -29,7 +29,12 @@ export const fetchTodos = async () => {
   return data;
 };
 
-export const addTodos = async (title: string) => {
+export const addKakeibo = async (
+    title: string,
+    isIncome: boolean,
+    date: string,
+    amount: number,
+) => {
   const {
     data: { user },
     error: userError,
@@ -46,22 +51,28 @@ export const addTodos = async (title: string) => {
   }
   
   const { data, error } = await supabase
-  .from("todo")
-  .insert([
-    {title: title, user_id: user.id}
-  ])
-  .select();
+    .from("kakeibo")
+    .insert([
+        {
+            title,
+            isIncome,
+            date,
+            amount,
+            user_id: user.id,
+        },
+    ])
+    .select();
   
-  if (error) {
-    console.error("追加エラー", error.message);
-  }
+    if (error) {
+        console.error("追加エラー", error.message);
+    }
 
-  return data;
+    return data;
 }; 
 
-export const deleteTodo = async (id: number) => {
+export const deleteKakeibo = async (id: number) => {
   const { error } =await supabase
-  .from("todo")
+  .from("kakeibo")
   .delete()
   .eq("id", id);
 

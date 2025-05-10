@@ -40,41 +40,43 @@ export default function Home() {
   }
 
   return (
-    <>
-      <main className="flex justify-center items-center h-screen">
-        <div className="max-w-md p-6 bg-gray-100 rounded-lg shadow-lg">
-          <p className="text-2xl font-bold mb-4">Top Page</p>
-          
+    <>          
           {!session ? (
-            <div>
-              <div className="mb-2">
-                <Link href="/user/login" className="text-blue-500 hover:underline">
-                  ログインページ
-                </Link>
-              </div>
-              <div className="mb-2">
-                <Link href="/user/signup" className="text-blue-500 hover:underline">
-                  新規登録ページ
-                </Link>
-              </div>
+          <main className="flex justify-center items-center h-screen">
+            <div className="max-w-md p-6 bg-gray-100 rounded-lg shadow-lg">
+                <div>
+                  <div className="mb-2">
+                    <Link href="/user/login" className="text-blue-500 hover:underline">
+                      ログインページ
+                    </Link>
+                  </div>
+                  <div className="mb-2">
+                    <Link href="/user/signup" className="text-blue-500 hover:underline">
+                      新規登録ページ
+                    </Link>
+                  </div>
+                </div>
             </div>
+          </main>
           ) : (
             <>
               <Header />
-              <Link href="/kakeibo">
-                <button className="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-2 rounded-full text-lg mt-4">
-                  家計簿
-                </button>
-              </Link>
-              <Link href="/todo">
-                <button className="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-2 rounded-full text-lg mt-4">
-                  やることリスト
-                </button>
-              </Link>
+              <main className="flex justify-center items-center h-screen">
+                <div className="max-w-md p-6 bg-gray-100 rounded-lg shadow-lg">
+                  <Link href="/kakeibo">
+                    <button className="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-2 rounded-full text-lg mt-4">
+                      家計簿
+                    </button>
+                  </Link>
+                  <Link href="/todo">
+                    <button className="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-2 rounded-full text-lg mt-4">
+                      やることリスト
+                    </button>
+                  </Link>
+                </div>
+              </main>
             </>
-          )}
-        </div>
-      </main>
+          )};
     </>
   );
 }

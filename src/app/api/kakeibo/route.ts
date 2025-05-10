@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '../../../lib/fetch';
+import { prisma } from '../../../lib/todoApi/fetch';
 import { createClient } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
 
