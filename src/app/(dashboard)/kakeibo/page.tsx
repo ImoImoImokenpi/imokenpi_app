@@ -1,158 +1,134 @@
 "use client";
 
-import { Button, ChakraProvider, Text, Checkbox, Flex, Input, Box } from '@chakra-ui/react';
-import { useEffect, useState } from 'react';
-import { supabase } from "../../../lib/supabase-client";
-import { useRouter } from "next/navigation";
-import type { User } from "@supabase/supabase-js"
-// import { prisma } from "../../../../lib/prisma";
+import React, { useEffect, useState } from 'react';
+import Header from "../../../components/Header";
+import KakeiboList from "../../../components/KakeiboList";
+import { fetchKakeibos, addKakeibo } from "../../../lib/kakeiboApi/fetch";
 
-export default async function Kakeibo() {
+const KakeiboPage = () => {
+  const [kakeibo, setKakeibo] = useState<any>([]);
+  const [title, setTitle] = useState("");
+  const [amount, setAmount] = useState("");
+  const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
+  const [isIncome, setIsIncome] = useState(false);
+
+
+  const getKakeibos = async () => {
+    const kakeibo = await fetchKakeibos();
+    setKakeibo(kakeibo); 
+  };
   
-    const kakeibos = await prisma.kakeibo.findMany();
-    const router = useRouter();
-    const [title, setTitle] = useState<string>('');
-    const [isIncome, setIsIncome] = useState(false);
-    const [amount, setAmount] = useState('');
-    const [user, setUser] = useState<User | null>(null);
+  useEffect(() => {
+    getKakeibos();
+  }, []);
 
-    useEffect(() => {
-      const getUser = async () => {
-        const { data, error } = await supabase.auth.getUser();
-        if (error) {
-          console.error("ユーザー取得エラー", error);
-          return;
-        }
-        setUser(data.user);  // data.user.id を auth_id として使える
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const parsedAmount = parseInt(amount);
+    if (!title || isNaN(parsedAmount)){
+      alert("正しい値を入力してください")
+      return;
+    };
+
+    const added = await addKakeibo(title, isIncome, date, parsedAmount);
+    if (added) {
+      setKakeibo([...kakeibo, ...added]);
+      setTitle("");
+      setAmount("");
+      setDate(new Date().toISOString().slice(0, 10));
+      setIsIncome(false);
+    }
+  };
+
+  // 今月を取得
+  const [currentMonth, setCurrentMonth] = useState(() => {
+      const today =new Date();
+      return new Date(today.getFullYear(), today.getMonth(), 1);
+  });
+  // 前月を取得
+  const handlePrevMonth = () => {
+      setCurrentMonth(prev => new Date(prev.getFullYear(), prev.getMonth() -1, 1));
+  }
+
+  // 翌月を取得
+  const handleNextMonth = () => {
+      setCurrentMonth(prev => new Date(prev.getFullYear(), prev.getMonth() +1, 1));
+  }
+  
+  const getMonthStartAndEnd = (date: Date) => {
+      const start = new Date(date.getFullYear(), date.getMonth(), 2);
+      const end = new Date(date.getFullYear(), date.getMonth() + 1, 1); // 末日
+      return {
+      min: start.toISOString().slice(0, 10),
+      max: end.toISOString().slice(0, 10),
       };
-      
-      getUser();
-    }, []);
-      
-    
-    // 現在日時の文字列の先頭10文字をスライス
-    const [date, setDate] = useState<string>(new Date().toISOString().slice(0, 10)); 
-    const [sum, setSum] = useState<number>(0)
-    // 今月を取得
-    const [currentMonth, setCurrentMonth] = useState(() => {
-        const today =new Date();
-        return new Date(today.getFullYear(), today.getMonth(), 1);
-    });
-    // 前月を取得
-    const handlePrevMonth = () => {
-        setCurrentMonth(prev => new Date(prev.getFullYear(), prev.getMonth() -1, 1));
-    }
-    
-    const addKakeibo = async () => {
-        if (!user) return alert('ユーザがログインしていません');
-        const data = {
-            title: title,
-            isIncome: isIncome,
-            date: date,
-            amount: parseInt(amount),
-            auth_id: user.id,
-        };
-
-        const response = await fetch('/api/kakeibo', {
-            method: 'POST',
-            body: JSON.stringify(data),
-            headers: { 'Content-Type': 'application/json' }
-        });
-
-        if (response.ok) {
-            alert('保存しました');
-        } else { 
-            alert('保存に失敗');
-        }
-    };
-
-    // const updateSum = async () => {
-    //     // 現在の月の収支を再計算
-    //     const { min, max } = getMonthStartAndEnd(currentMonth);
-    //     const { data, error } = await supabase
-    //         .from('kakeibo')
-    //         .select('amount, isIncome')
-    //         .gte('date', min)
-    //         .lte('date', max);
-
-    //     if (error) {
-    //         console.error(error);
-    //         return;
-    //     }
-
-    //     const total = data?.reduce((acc, record) => {
-    //         return record.isIncome ? acc + record.amount : acc - record.amount;
-    //     }, 0) || 0;
-
-    //     setSum(total);
-    // };
-        
-    // 翌月を取得
-    const handleNextMonth = () => {
-        setCurrentMonth(prev => new Date(prev.getFullYear(), prev.getMonth() +1, 1));
-    }
+  };
   
-    const getMonthStartAndEnd = (date: Date) => {
-        const start = new Date(date.getFullYear(), date.getMonth(), 2);
-        const end = new Date(date.getFullYear(), date.getMonth() + 1, 1); // 末日
-        return {
-        min: start.toISOString().slice(0, 10),
-        max: end.toISOString().slice(0, 10),
-        };
-    };
-  
-    const { min, max } = getMonthStartAndEnd(currentMonth);
+  const { min, max } = getMonthStartAndEnd(currentMonth);
 
   return (
-    <ChakraProvider>
-      <div>
-        <Text fontSize="2x1">家計簿アプリ</Text>
-        <Flex align="center" justifyContent="space-between" my="4">
-          <Button onClick={handlePrevMonth}>←</Button>
-          <Text fontSize="lg">
-            {currentMonth.getFullYear()}年 {currentMonth.getMonth() + 1}月
-          </Text>
-          <Button onClick={handleNextMonth}>→</Button>
-        </Flex>
-        <Box mb="8px">
-          <Input
-            placeholder="タイトルを入力" 
-            mb="4px" 
-            onChange={(e) => setTitle(e.target.value)}
-            value={title}
-          />
-          <Input 
-            placeholder="金額を入力" 
-            mb="4px" 
-            type="number"
-            onChange={(e) => setAmount(e.target.value)}
-            value={amount}
-          />
-          <Input
-            type="date"
-            mb="4px"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-            min = {min}
-            max = {max}
-          />
-          <Flex align="center" justifyContent="space-between">
-            <Checkbox 
-              onChange={() => setIsIncome(!isIncome)}
-              isChecked={isIncome}
+    <>
+      <Header />
+      <section className="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg shadow-md">
+        <h3 className="text-2xl font-bold mb-4 text-center text-gray-800">家計簿</h3>
+        <div className="flex justify-between items-center mb-4">
+            <button 
+              onClick={handlePrevMonth}
+              className="text-2xl w-12 h-12 bg-gray-100 hover:bg-gray-200 rounded-full shadow flex items-center justify-center"
             >
-              入金
-            </Checkbox>
-            <Button colorScheme="teal" onClick={addKakeibo}>
-              追加  
-            </Button>
-          </Flex>
-        </Box>
-        <Text fontSize="xl" mt="4">
-          合計: {sum}円  
-        </Text>
-        </div>
-    </ChakraProvider>
+              ⬅
+            </button>
+            <span className="text-lg font-medium">
+              {currentMonth.getFullYear()}年 {currentMonth.getMonth() + 1}月
+            </span>
+            <button 
+              onClick={handleNextMonth}
+              className="text-2xl w-12 h-12 bg-gray-100 hover:bg-gray-200 rounded-full shadow flex items-center justify-center"
+            >
+              ➡
+            </button>
+          </div>
+            <form onSubmit={handleSubmit} className="space-y-4 px-2">
+              <input
+                placeholder="タイトルを入力"
+                className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+                value={title}
+              />
+              <input
+                placeholder="金額を入力"
+                className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+                onChange={(e) => setAmount(e.target.value)}
+                value={amount}
+              />
+              <input
+                type="date"
+                className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+                min={min}
+                max={max}
+              />
+              {/* <label className="inline-flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  checked={isIncome}
+                  onChange={() => setIsIncome(!isIncome)}
+                  className="w-4 h-4"
+                />
+                <span>入金</span>
+              </label> */}
+              <button
+                type="submit"
+                className="w-full py-2 bg-teal-500 text-white rounded hover:bg-teal-600"
+              >
+                追加
+              </button>
+            </form>
+          </section>
+          <KakeiboList kakeibo={kakeibo} onDelete={getKakeibos} />
+    </>
   );
 }
 
+export default KakeiboPage;
