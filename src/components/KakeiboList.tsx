@@ -19,7 +19,7 @@ const KakeiboList = ({kakeibo, onDelete}: Props) => {
                 {kakeibo.map((item) => (
                     <li
                     key={item.id}
-                    className="flex justify-between items-center px-4 py-3 bg-white border rounded shadow-sm"
+                    className="flex justify-between items-center px-4 py-3 bg-white border-gray-300 rounded shadow-sm"
                     >
                         <div className="flex flex-col text-sm text-gray-700">
                         <span className="font-semibold">{item.title}</span>
