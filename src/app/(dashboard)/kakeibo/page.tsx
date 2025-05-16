@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import Header from "../../../components/Header";
 import KakeiboList from "../../../components/KakeiboList";
 import { fetchKakeibos, addKakeibo } from "../../api/kakeiboApi/fetch";
+import Link from "next/link";
 
 const KakeiboPage = () => {
   const [kakeibo, setKakeibo] = useState<any>([]);
@@ -133,12 +134,19 @@ const KakeiboPage = () => {
             </button>
           </form>
         </div>
+        <br />
+        <KakeiboList kakeibo={kakeibo} onDelete={getKakeibos} />
+        <section className="max-w-md mx-auto mt-4 p-4 bg-white rounded-lg shadow-md">
+          <h4 className="text-lg font-semibold text-gray-700 mb-2">今月の合計</h4>
+          <p>支出：<span className="font-bold">{total.toLocaleString()}円</span></p>
+        </section>
       </section>
-      <KakeiboList kakeibo={kakeibo} onDelete={getKakeibos} />
-      <section className="max-w-md mx-auto mt-4 p-4 bg-white rounded-lg shadow-md">
-        <h4 className="text-lg font-semibold text-gray-700 mb-2">今月の合計</h4>
-        <p>支出：<span className="font-bold">{total.toLocaleString()}円</span></p>
-      </section>
+      <br />
+      <div className="flex justify-end">
+        <Link href="/" className="bg-gray-100 text-teal-500 px-4 py-2 rounded hover:bg-green-100 transition">
+          ホームへ戻る
+        </Link>
+      </div>
     </>
   );
 }

@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import Header from "../../../components/Header";
 import TodoList from "../../../components/TodoList";
 import { fetchTodos, addTodo } from "../../api/todoApi/fetch";
+import Link from "next//link";
 
 const TodoPage = () => {
   const [todo, setTodo] = useState<any>([]);
@@ -51,6 +52,12 @@ const TodoPage = () => {
             </form>
         <TodoList todo={todo} onDelete={getTodos} />
         </section>
+        <br />
+        <div className="flex justify-end">
+          <Link href="/" className="bg-gray-100 text-teal-500 px-4 py-2 rounded hover:bg-green-100 transition">
+            ホームへ戻る
+          </Link>
+        </div>
     </>
   );
 };
