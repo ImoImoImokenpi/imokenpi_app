@@ -1,4 +1,4 @@
-import { supabase } from '../supabase-client';
+import { supabase } from '../../../lib/supabase-client';
 
 export const fetchTodos = async () => {
   const {

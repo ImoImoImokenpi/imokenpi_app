@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import Header from "../../../components/Header";
 import TodoList from "../../../components/TodoList";
-import { fetchTodos, addTodo } from "../../../lib/todoApi/fetch";
+import { fetchTodos, addTodo } from "../../api/todoApi/fetch";
 
 const TodoPage = () => {
   const [todo, setTodo] = useState<any>([]);
@@ -44,7 +44,7 @@ const TodoPage = () => {
                 />
                 <button
                 type="submit"
-                className="px-4 py-2 bg-blue-500 text-white rounded-r-md hover:bg-blue-600 transition"
+                className="w-full py-2 bg-teal-500 text-white rounded hover:bg-teal-600"
                 >
                 追加
                 </button>
