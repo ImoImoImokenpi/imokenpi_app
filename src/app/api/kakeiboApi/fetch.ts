@@ -1,6 +1,7 @@
+import { stagger } from 'framer-motion/dom';
 import { supabase } from '../../../lib/supabase-client';
 
-export const fetchKakeibos = async () => {
+export const fetchKakeibosByMonth = async (year: number, month: number) => {
   const {
     data: { user },
     error: userError,
@@ -16,10 +17,15 @@ export const fetchKakeibos = async () => {
     return [];
   }
 
+  const startDate = `${year}-${String(month).padStart(2, "0")}-01`;
+  const endDate = new Date(year, month, 0).toISOString().split("T")[0];
+
   const { data, error } = await supabase
     .from("kakeibo")
     .select("*")
-    .eq("user_id", user.id);  // ユーザーIDでフィルタ
+    .eq("user_id", user.id)  // ユーザーIDでフィルタ
+    .gte("date", startDate)
+    .lte("date", endDate);
 
   if (error) {
     console.error("todo取得エラー:", error.message);
@@ -28,6 +34,7 @@ export const fetchKakeibos = async () => {
 
   return data;
 };
+
 
 export const addKakeibo = async (
     title: string,

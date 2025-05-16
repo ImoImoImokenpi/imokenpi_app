@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Header from "../../../components/Header";
 import KakeiboList from "../../../components/KakeiboList";
-import { fetchKakeibos, addKakeibo } from "../../api/kakeiboApi/fetch";
+import { fetchKakeibosByMonth, addKakeibo } from "../../api/kakeiboApi/fetch";
 import Link from "next/link";
 
 const KakeiboPage = () => {
@@ -14,14 +14,12 @@ const KakeiboPage = () => {
   const [isIncome, setIsIncome] = useState(false);
 
 
-  const getKakeibos = async () => {
-    const kakeibo = await fetchKakeibos();
+  const getKakeibos = async (date: Date) => {
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+    const kakeibo = await fetchKakeibosByMonth(year, month);
     setKakeibo(kakeibo); 
   };
-  
-  useEffect(() => {
-    getKakeibos();
-  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,13 +45,19 @@ const KakeiboPage = () => {
       const today =new Date();
       return new Date(today.getFullYear(), today.getMonth(), 1);
   });
+
   const handlePrevMonth = () => {
-      setCurrentMonth(prev => new Date(prev.getFullYear(), prev.getMonth() -1, 1));
-  }
-  const handleNextMonth = () => {
-      setCurrentMonth(prev => new Date(prev.getFullYear(), prev.getMonth() +1, 1));
-  }
+    setCurrentMonth(prev => new Date(prev.getFullYear(), prev.getMonth() - 1, 1));
+  };
   
+  const handleNextMonth = () => {
+    setCurrentMonth(prev => new Date(prev.getFullYear(), prev.getMonth() + 1, 1));
+  };  
+
+  useEffect(() => {
+    getKakeibos(currentMonth);
+  }, [currentMonth]);
+
   // 日付入力のカレンダー表示
   const getMonthStartAndEnd = (date: Date) => {
       const start = new Date(date.getFullYear(), date.getMonth(), 2);
@@ -135,7 +139,7 @@ const KakeiboPage = () => {
           </form>
         </div>
         <br />
-        <KakeiboList kakeibo={kakeibo} onDelete={getKakeibos} />
+        <KakeiboList kakeibo={kakeibo} onDelete={() => getKakeibos(currentMonth)} />
         <section className="max-w-md mx-auto mt-4 p-4 bg-white rounded-lg shadow-md">
           <h4 className="text-lg font-semibold text-gray-700 mb-2">今月の合計</h4>
           <p>支出：<span className="font-bold">{total.toLocaleString()}円</span></p>
