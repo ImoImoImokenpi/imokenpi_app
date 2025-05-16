@@ -1,6 +1,6 @@
 import React from "react";
 import { Todo } from "../lib/interface";
-import { deleteTodo } from "../lib/todoApi/fetch";
+import { deleteTodo } from "../app/api/todoApi/fetch";
 
 type Props = {
     todo: Todo[];
